@@ -27,18 +27,22 @@ public class JsonTaskTrigger implements Runnable {
 
     @Override
     public void run() {
-        try {
-            JsonObject json = pollJsonTaskFromCloud();
-            String status = json.getString("status");
-            if(!status.equals("data")) return;
-            JsonTask task = jsonTaskFactory.getTask(getDataObject(json));
-            task.execute();
-        } catch (IOException e) {
-            log.error("JSON read error", e);
-        }catch (Exception e){
-            log.error(e);
-        }
+        if(!CloudQueue.isEnabled()) return;
 
+        String status = "data";
+        while(!status.equals("EmptyQueue")){
+            try {
+                JsonObject json = pollJsonTaskFromCloud();
+                status = json.getString("status");
+                if(!status.equals("data")) continue;
+                JsonTask task = jsonTaskFactory.getTask(getDataObject(json));
+                if(task != null) task.execute();
+            } catch (IOException e) {
+                log.error("JSON read error", e);
+            }catch (Exception e){
+                log.error(e);
+            }
+        }
     }
 
     protected JsonObject getDataObject(JsonObject json) {
