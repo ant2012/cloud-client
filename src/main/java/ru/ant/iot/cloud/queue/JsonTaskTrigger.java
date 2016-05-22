@@ -6,8 +6,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
-import ru.ant.common.App;
-import ru.ant.common.JsonUtils;
 
 import javax.json.JsonObject;
 import java.io.IOException;
@@ -17,11 +15,12 @@ import java.io.IOException;
  */
 public class JsonTaskTrigger implements Runnable {
 
-    private String taskQueueCloudKey;
     private Logger log = Logger.getLogger(getClass());
+    private final String taskQueueCloudKey;
     private final JsonTaskFactory jsonTaskFactory;
 
-    public JsonTaskTrigger(JsonTaskFactory jsonTaskFactory) {
+    public JsonTaskTrigger(String taskQueueCloudKey, JsonTaskFactory jsonTaskFactory) {
+        this.taskQueueCloudKey = taskQueueCloudKey;
         this.jsonTaskFactory = jsonTaskFactory;
     }
 
@@ -62,12 +61,7 @@ public class JsonTaskTrigger implements Runnable {
     }
 
     public String getTaskQueueUrl() {
-        return String.format("http://queue.msensk.ru/task-queue?key=%1$s&direction=get", getTaskQueueCloudKey());
-    }
-
-    private String getTaskQueueCloudKey() {
-        if(taskQueueCloudKey !=null) return taskQueueCloudKey;
-        return taskQueueCloudKey = App.getProperty("cloud.key");
+        return String.format("http://queue.msensk.ru/task-queue?key=%1$s&direction=get", taskQueueCloudKey);
     }
 
 }
