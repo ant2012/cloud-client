@@ -37,7 +37,7 @@ public class JsonTaskTrigger implements Runnable {
                 JsonTask task = jsonTaskFactory.getTask(getDataObject(json));
                 if(task != null) task.execute();
             } catch (IOException e) {
-                log.error("JSON read error", e);
+                log.error("JSON read error: "+e.getMessage());
             }catch (Exception e){
                 log.error(e);
             }
